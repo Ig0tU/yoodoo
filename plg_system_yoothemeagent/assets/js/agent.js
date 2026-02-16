@@ -74,30 +74,47 @@
 </button>
 `;
 
-    // --- SOV Core Logic (Adapted from ai2.js) ---
-    const SOV = {
-        HybridArchitect: {
-            isYOOtheme() { return !!document.querySelector('.yo-customizer') || !!document.querySelector('.yo-builder'); },
-            getLayoutData() {
-                if (window.yooThemeBuilderData) return window.yooThemeBuilderData;
+    // --- SOV Core Logic (Exposed Globally) ---
+    window.SOV = {
+        observe: () => {
+            const isYoo = !!document.querySelector('.yo-customizer') || !!document.querySelector('.yo-builder');
+            if (!isYoo) return { mode: 'GENERIC', status: 'Not in YOOtheme' };
+
+            let layoutData = null;
+            if (window.yooThemeBuilderData) layoutData = window.yooThemeBuilderData;
+            else {
                 const script = document.getElementById('yootheme-builder-data');
-                if (script && script.textContent) { try { return JSON.parse(script.textContent); } catch (e) {} }
-                return null;
+                if (script && script.textContent) { try { layoutData = JSON.parse(script.textContent); } catch (e) {} }
+            }
+            return { mode: 'YOOTHEME', layout: layoutData };
+        },
+
+        interact: async (intent, data) => {
+            console.log(`[SOV] Intent: ${intent}`, data);
+            switch(intent) {
+                case 'OPEN_AGENT':
+                    const container = document.getElementById('yoo-agent-wrapper');
+                    if (container) container.style.display = 'block';
+                    break;
+                case 'THINK':
+                    if (data.prompt) return await AIProvider.sendMessage(SYSTEM_PROMPT + "\n\nUser: " + data.prompt, window.YOO_AGENT_CONFIG || {});
+                    break;
+                case 'TYPE':
+                    if (data.selector && data.text) {
+                        const el = (typeof data.selector === 'string') ? document.querySelector(data.selector) : data.selector;
+                        if (!el) return;
+                        el.focus();
+                        for (const char of data.text) {
+                            if (el.tagName === 'TEXTAREA' || el.tagName === 'INPUT') el.value += char;
+                            else if (el.isContentEditable) el.textContent += char;
+                            el.dispatchEvent(new Event('input', { bubbles: true }));
+                            await new Promise(r => setTimeout(r, 20));
+                        }
+                    }
+                    break;
             }
         },
-        ActionExecutor: {
-            async humanType(selector, text) {
-                const el = (typeof selector === 'string') ? document.querySelector(selector) : selector;
-                if (!el) return;
-                el.focus();
-                for (const char of text) {
-                    if (el.tagName === 'TEXTAREA' || el.tagName === 'INPUT') el.value += char;
-                    else if (el.isContentEditable) el.textContent += char;
-                    el.dispatchEvent(new Event('input', { bubbles: true }));
-                    await new Promise(r => setTimeout(r, 20));
-                }
-            }
-        },
+
         SecOpsGovernance: {
             validatePayload(input) {
                 const blacklist = [/javascript:/i, /<script/i, /onload=/i];
@@ -105,6 +122,8 @@
             }
         }
     };
+
+    const SOV_INTERNAL = window.SOV;
 
     // --- AI Provider ---
     const AIProvider = {
@@ -276,7 +295,7 @@
         const text = input.value.trim();
         if (!text || state.isGenerating) return;
 
-        if (!SOV.SecOpsGovernance.validatePayload(text)) {
+        if (!SOV_INTERNAL.SecOpsGovernance.validatePayload(text)) {
             addMessage('agent', '⚠️ Malicious input detected and blocked.');
             return;
         }
@@ -291,7 +310,7 @@
             const response = await AIProvider.sendMessage(SYSTEM_PROMPT + "\n\nUser: " + text, window.YOO_AGENT_CONFIG || {});
             removeTypingIndicator();
 
-            if (!SOV.SecOpsGovernance.validatePayload(response)) {
+            if (!SOV_INTERNAL.SecOpsGovernance.validatePayload(response)) {
                 addMessage('agent', '⚠️ Malicious payload detected in AI response.');
                 return;
             }

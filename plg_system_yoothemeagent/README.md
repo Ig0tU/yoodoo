@@ -31,3 +31,30 @@ plg_system_yoothemeagent/
 3. Upload the zip file.
 4. Go to Extensions > Plugins and enable "System - YOOtheme Builder Agent".
 5. Configure your API keys in the plugin settings.
+
+## Invocation & Enactment
+
+### Via User Interface
+1. Once enabled, a **Wand Magic Icon** will appear at the bottom-right of your website for users with Administrator privileges.
+2. Click this icon to toggle the YOOtheme Builder Agent overlay.
+3. Use the chat interface to describe what you want to build.
+
+### Programmatic Invocation (Developer Console)
+You can interact with the agent via the global `SOV` object:
+
+- **Open the Agent UI**:
+  ```javascript
+  SOV.interact('OPEN_AGENT');
+  ```
+
+- **Query the AI directly**:
+  ```javascript
+  const response = await SOV.interact('THINK', { prompt: 'Create a custom UIkit button' });
+  console.log(response);
+  ```
+
+- **Observe current context**:
+  ```javascript
+  const state = SOV.observe();
+  console.log(state);
+  ```
