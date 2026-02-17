@@ -209,8 +209,12 @@
     \`\`\``;
 
     function initUI() {
+        console.log('[YOOtheme Agent] Initializing UI...');
         const root = document.getElementById('yoo-agent-root');
-        if (!root) return;
+        if (!root) {
+            console.warn('[YOOtheme Agent] Root element #yoo-agent-root not found.');
+            return;
+        }
         root.innerHTML = AGENT_HTML;
 
         const container = document.getElementById('yoo-agent-wrapper');
@@ -350,12 +354,26 @@
 
     function renderMessages() {
         const chatMessages = document.getElementById('chatMessages');
+        if (!chatMessages) return;
+
+        const parseContent = (content) => {
+            try {
+                if (window.marked && typeof window.marked.parse === 'function') {
+                    return window.marked.parse(content);
+                }
+                return content.replace(/\n/g, '<br>'); // Simple fallback
+            } catch (e) {
+                console.error('[YOOtheme Agent] Marked parse error:', e);
+                return content;
+            }
+        };
+
         chatMessages.innerHTML = state.messages.map(m => `
             <div class="message ${m.role}">
                 <div class="message-avatar">${m.role === 'agent' ? '<i class="fa-solid fa-cube"></i>' : '<i class="fa-solid fa-user"></i>'}</div>
                 <div class="message-body">
                     <div class="message-sender">${m.role === 'agent' ? 'YOO Agent' : 'You'}</div>
-                    <div class="message-content">${marked.parse(m.content)}</div>
+                    <div class="message-content">${parseContent(m.content)}</div>
                 </div>
             </div>
         `).join('');
@@ -426,7 +444,17 @@
         document.getElementById('welcomeState').style.display = 'none';
         const container = document.getElementById('codeContainer');
         container.style.display = 'block';
-        container.innerHTML = `<pre><code class="hljs">${hljs.highlightAuto(file.content).value}</code></pre>`;
+
+        let highlighted = file.content;
+        try {
+            if (window.hljs && typeof window.hljs.highlightAuto === 'function') {
+                highlighted = window.hljs.highlightAuto(file.content).value;
+            }
+        } catch (e) {
+            console.error('[YOOtheme Agent] Highlighting error:', e);
+        }
+
+        container.innerHTML = `<pre><code class="hljs">${highlighted}</code></pre>`;
         renderFileTree();
         renderFileTabs();
         updateStatusBar();

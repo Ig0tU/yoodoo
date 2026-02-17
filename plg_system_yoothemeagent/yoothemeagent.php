@@ -83,8 +83,12 @@ class PlgSystemYoothemeagent extends CMSPlugin
 
         // Simple injection of the agent container
         if (strpos($body, 'id="yoo-agent-root"') === false) {
-            $agentHtml = '<div id="yoo-agent-root"></div>';
-            $body = str_replace('</body>', $agentHtml . '</body>', $body);
+            $agentHtml = "\n" . '<div id="yoo-agent-root"></div>' . "\n";
+            if (stripos($body, '</body>') !== false) {
+                $body = str_ireplace('</body>', $agentHtml . '</body>', $body);
+            } else {
+                $body .= $agentHtml;
+            }
             $app->setBody($body);
         }
     }
