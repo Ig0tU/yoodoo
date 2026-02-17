@@ -5,7 +5,7 @@ use Joomla\CMS\Plugin\CMSPlugin;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Uri\Uri;
 
-class PlgSystemYoothemeagent extends CMSPlugin
+class PlgSystemAiagent extends CMSPlugin
 {
     protected $autoloadLanguage = true;
 
@@ -27,14 +27,6 @@ class PlgSystemYoothemeagent extends CMSPlugin
             return;
         }
 
-        // Only inject in YOOtheme Customizer or if forced?
-        // For now, let's look for the YOOtheme customizer signature
-        $isCustomizer = $app->input->get('option') === 'com_ajax' && $app->input->get('p') === 'customizer';
-
-        // Also check if we are in the preview iframe
-        $isPreview = $app->input->get('tpl') === 'yootheme';
-
-        // We'll inject it everywhere for now to be safe, but usually it's for the customizer
         $this->injectAgent($doc);
     }
 
@@ -46,7 +38,7 @@ class PlgSystemYoothemeagent extends CMSPlugin
         $jsParams = json_encode([
             'ai_provider' => $params->get('ai_provider', 'ollama'),
             'ollama_cloud_url' => $params->get('ollama_cloud_url', 'https://api.ollama.com'),
-            'ajax_url' => Uri::root() . 'index.php?option=com_ajax&plugin=yoothemeagent&group=system&format=json'
+            'ajax_url' => Uri::root() . 'index.php?option=com_ajax&plugin=aiagent&group=system&format=json'
         ]);
 
         $doc->addScriptDeclaration("window.YOO_AGENT_CONFIG = {$jsParams};");
@@ -61,8 +53,8 @@ class PlgSystemYoothemeagent extends CMSPlugin
         $doc->addScript('https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.0/marked.min.js');
 
         // Add plugin assets
-        $doc->addStyleSheet(Uri::root(true) . '/plugins/system/yoothemeagent/assets/css/agent.css');
-        $doc->addScript(Uri::root(true) . '/plugins/system/yoothemeagent/assets/js/agent.js');
+        $doc->addStyleSheet(Uri::root(true) . '/plugins/system/aiagent/assets/css/agent.css');
+        $doc->addScript(Uri::root(true) . '/plugins/system/aiagent/assets/js/agent.js');
     }
 
     public function onAfterRender()
@@ -96,7 +88,7 @@ class PlgSystemYoothemeagent extends CMSPlugin
     /**
      * AJAX handler for secure AI requests
      */
-    public function onAjaxYoothemeagent()
+    public function onAjaxAiagent()
     {
         $app = Factory::getApplication();
         $user = Factory::getUser();
@@ -144,7 +136,7 @@ class PlgSystemYoothemeagent extends CMSPlugin
             'Content-Type: application/json',
             'Authorization: Bearer ' . $key,
             'HTTP-Referer: ' . Uri::root(),
-            'X-Title: YOOtheme Agent'
+            'X-Title: AI Agent'
         ]);
 
         $response = curl_exec($ch);
