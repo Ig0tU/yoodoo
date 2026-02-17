@@ -66,23 +66,25 @@ html:not(.dark) {
 }
 
 #yoo-agent-toggle-btn {
-  position: fixed;
-  bottom: 24px;
-  right: 24px;
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--yoo-blue), var(--yoo-cyan));
-  color: white;
-  border: none;
-  cursor: pointer;
-  box-shadow: 0 4px 16px rgba(37, 99, 235, 0.4);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 24px;
-  z-index: 999999;
-  transition: transform 0.2s;
+  position: fixed !important;
+  bottom: 24px !important;
+  right: 24px !important;
+  width: 56px !important;
+  height: 56px !important;
+  border-radius: 50% !important;
+  background: linear-gradient(135deg, var(--yoo-blue), var(--yoo-cyan)) !important;
+  color: white !important;
+  border: none !important;
+  cursor: pointer !important;
+  box-shadow: 0 4px 16px rgba(37, 99, 235, 0.4) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 24px !important;
+  z-index: 999999 !important;
+  transition: transform 0.2s !important;
+  visibility: visible !important;
+  opacity: 1 !important;
 }
 
 #yoo-agent-toggle-btn:hover {

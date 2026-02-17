@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <extension type="plugin" group="system" method="upgrade">
-    <name>plg_system_yoothemeagent</name>
+    <name>plg_system_aiagent</name>
     <author>Sov0rc</author>
     <creationDate>March 2024</creationDate>
     <copyright>Copyright (C) 2024 Sov0rc. All rights reserved.</copyright>
@@ -8,9 +8,9 @@
     <authorEmail>admin@example.com</authorEmail>
     <authorUrl>www.example.com</authorUrl>
     <version>1.0.0</version>
-    <description>YOOtheme Builder Agent - AI-powered development assistant for YOOtheme Pro.</description>
+    <description>AI Agent - AI-powered development assistant for YOOtheme Pro.</description>
     <files>
-        <filename plugin="yoothemeagent">yoothemeagent.php</filename>
+        <filename plugin="aiagent">aiagent.php</filename>
         <folder>assets</folder>
         <folder>language</folder>
     </files>
